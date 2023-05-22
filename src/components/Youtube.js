@@ -1,5 +1,7 @@
+import { Formik ,Form, Field, ErrorMessage} from 'formik';
 import React from 'react';
-import { useFormik } from 'formik';
+// import { useFormik } from 'formik';
+import* as Yup from 'yup'
 const initialValues = {
     name:'',
     email:'',
@@ -10,87 +12,63 @@ const onSubmit = values => {
     console.log('Form values', values);
 }
 
-const  validate = values => {
-    //values.name values.email values.channel
-    //error.name error.email error.channel
-    //errors.name = 'This field is required' 
-    let errors = {}
-
-    if(!values.name){
-        errors.name = 'Required'
-    }
-    if(!values.email){
-        errors.email = 'Required'
-    }else if(!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)){
-        errors.email = 'Invalid email format'
-    }
-    
-    if(!values.channel){
-        errors.channel = 'Required'
-    }
-
-    return errors
-}
+const validationSchema = Yup.object({
+    name: Yup.string().required('Required!'),
+    email: Yup.string().email('Invalid email format').required('Required'),
+    channel: Yup.string().required('Required')
+})
 
 const Youtube = () => {
+    // Reducing boilerplate
+    // Formik components 1.Formik 2.Form 3.Field 4.ErrorMessage
 
-    const formik = useFormik({
-        initialValues, 
-        onSubmit,
-        validate,
-    })
-    
-    //console.log('Form values', formik.values);
-    //console.log('error values', formik.errors);
-    console.log('visited fields', formik.touched);
-    
+    // const formik = useFormik({
+    //     initialValues, 
+    //     onSubmit,
+    //     validationSchema
+    // })
     
     return (
-        <div>
-            <form onSubmit={formik.handleSubmit}>
+        <Formik
+            initialValues={initialValues}
+            validationSchema={validationSchema}
+            onSubmit={onSubmit}
+            >
+            <Form>
                 <div className='form-control'>
                     <label htmlFor='name'>Name</label>
-                    <input 
+                    <Field 
                         type='text' 
                         id='name' 
                         name='name' 
-                        onChange={formik.handleChange} 
-                        onBlur={formik.handleBlur} 
-                        value={formik.values.name}
                     />
-                    {formik.touched.name && formik.errors.name ? <div className='error'>{formik.errors.name}</div> : null}
+                    <ErrorMessage name='name'/>
                 </div>
 
                 <div className='form-control'>
                     <label htmlFor='email'>Email</label>
-                    <input 
+                    <Field 
                         type='email' 
                         id='email' 
-                        name='email' 
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur} 
-                        value={formik.values.email}
+                        name='email'                        
                     />
-                    {formik.touched.email && formik.errors.email ? <div className='error'>{formik.errors.email}</div> : null}
+                    <ErrorMessage name='email'/>                 
                 </div>
 
                 <div className='form-control'>
                     <label htmlFor='channel'>Channel</label>
-                    <input 
+                    <Field 
                         type='text' 
                         id='channel' 
-                        name='channel' 
-                        onChange={formik.handleChange} 
-                        onBlur={formik.handleBlur} 
-                        value={formik.values.channel}
+                        name='channel'                       
                     />
-                    {formik.touched.channel && formik.errors.channel ? <div className='error'>{formik.errors.channel}</div> : null}
+                    <ErrorMessage name='channel'/>                
                 </div>
 
                 <button type='submit'>Submit</button>
 
-            </form>
-        </div>
+            </Form>
+        </Formik>
     );
 };
 
